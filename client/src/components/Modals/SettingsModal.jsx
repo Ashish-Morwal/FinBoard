@@ -21,9 +21,12 @@ export default function SettingsModal() {
   useEffect(() => {
     if (isOpen) {
       dispatch(loadSettings());
-      setLocalApiKeys(apiKeys);
     }
-  }, [isOpen, apiKeys, dispatch]);
+  }, [isOpen, dispatch]);
+
+  useEffect(() => {
+    setLocalApiKeys(apiKeys);
+  }, [apiKeys]);
 
   const handleCloseModal = () => {
     dispatch(closeSettingsModal());
