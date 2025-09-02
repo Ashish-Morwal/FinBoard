@@ -17,7 +17,7 @@ export default function AddWidgetModal() {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { modals } = useSelector((state) => state.dashboard);
-  const { settings } = useSelector((state) => state);
+  const settings = useSelector((state) => state.settings);
   
   const { isOpen, newWidget, apiFields, isTestingApi, apiTestResult } = modals.addWidget;
   
