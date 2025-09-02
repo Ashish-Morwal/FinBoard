@@ -7,12 +7,10 @@ export default function ThemeProvider({ children }) {
   const { theme } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
-    // Load theme from localStorage on mount
+    // Load theme from localStorage on mount only
     const savedTheme = localStorage.getItem('finboard-theme') || 'dark';
-    if (savedTheme !== theme) {
-      dispatch(setTheme(savedTheme));
-    }
-  }, [dispatch, theme]);
+    dispatch(setTheme(savedTheme));
+  }, [dispatch]);
 
   useEffect(() => {
     // Apply theme to document and save to localStorage
