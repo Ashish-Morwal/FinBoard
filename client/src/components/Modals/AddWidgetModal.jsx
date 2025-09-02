@@ -54,12 +54,14 @@ export default function AddWidgetModal() {
 
     try {
       const response = await testApiConnection(newWidget.apiUrl, settings.apiKeys);
+      console.log('API Response:', response);
       const fields = extractFieldsFromResponse(response);
+      console.log('Extracted fields:', fields);
       
       dispatch(setApiFields(fields));
       dispatch(setApiTestResult({
         success: true,
-        message: `API connection successful! ${fields.length} top-level fields found.`,
+        message: `API connection successful! ${fields.length} fields found.`,
       }));
       
       toast({
@@ -293,6 +295,7 @@ export default function AddWidgetModal() {
                 <div className="mb-4">
                   <label className="text-xs text-muted-foreground mb-2 block">Available Fields</label>
                   <div className="bg-secondary/30 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
+                    {console.log('Filtered fields in UI:', filteredFields)}
                     {filteredFields.length > 0 ? (
                       filteredFields.map((field, index) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-input rounded border border-border hover:bg-accent/50 transition-colors">
