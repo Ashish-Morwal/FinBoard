@@ -141,8 +141,8 @@ export default function AddWidgetModal() {
 
   return (
     <div className="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50" data-testid="add-widget-modal">
-      <div className="bg-popover border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-border">
+      <div className="bg-popover border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <h2 className="text-lg font-semibold text-popover-foreground">Add New Widget</h2>
           <button 
             className="text-muted-foreground hover:text-foreground p-1"
@@ -153,7 +153,7 @@ export default function AddWidgetModal() {
           </button>
         </div>
         
-        <div className="p-6 overflow-y-auto">
+        <div className="p-6 overflow-y-auto flex-grow">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Widget Name */}
             <div>
@@ -345,26 +345,27 @@ export default function AddWidgetModal() {
                 </div>
               </div>
             )}
-            
-            {/* Modal Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-border">
-              <button 
-                type="button"
-                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-accent transition-colors"
-                onClick={handleCloseModal}
-                data-testid="button-cancel"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit"
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                data-testid="button-add-widget"
-              >
-                Add Widget
-              </button>
-            </div>
           </form>
+        </div>
+        
+        {/* Modal Actions - Fixed at bottom */}
+        <div className="flex justify-end space-x-3 p-6 border-t border-border flex-shrink-0">
+          <button 
+            type="button"
+            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-accent transition-colors"
+            onClick={handleCloseModal}
+            data-testid="button-cancel"
+          >
+            Cancel
+          </button>
+          <button 
+            type="button"
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            data-testid="button-add-widget"
+          >
+            Add Widget
+          </button>
         </div>
       </div>
     </div>
