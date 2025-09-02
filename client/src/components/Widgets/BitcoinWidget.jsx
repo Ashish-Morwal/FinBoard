@@ -21,13 +21,7 @@ export default function BitcoinWidget({ widget }) {
   const renderFieldValue = (field) => {
     if (!widget.data) return 'Loading...';
     
-    // Debug logging
-    console.log('Widget data:', widget.data);
-    console.log('Field path:', field.path);
-    
     const value = getNestedValue(widget.data, field.path);
-    
-    console.log('Extracted value:', value);
     
     if (value === undefined || value === null) return 'N/A';
     

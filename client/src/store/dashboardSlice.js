@@ -139,6 +139,11 @@ const dashboardSlice = createSlice({
         lastUpdated: new Date().toISOString(),
       };
       state.widgets.push(newWidget);
+      // Auto-save to localStorage when widget is added
+      saveDashboardConfig({
+        widgets: state.widgets,
+        theme: state.theme,
+      });
     },
     removeWidget: (state, action) => {
       const widgetId = action.payload;
@@ -147,6 +152,11 @@ const dashboardSlice = createSlice({
       state.widgets.forEach((widget, index) => {
         widget.position = index;
       });
+      // Auto-save to localStorage when widget is removed
+      saveDashboardConfig({
+        widgets: state.widgets,
+        theme: state.theme,
+      });
     },
     updateWidget: (state, action) => {
       const { id, updates } = action.payload;
@@ -154,6 +164,11 @@ const dashboardSlice = createSlice({
       if (widgetIndex !== -1) {
         state.widgets[widgetIndex] = { ...state.widgets[widgetIndex], ...updates };
       }
+      // Auto-save to localStorage when widget is updated
+      saveDashboardConfig({
+        widgets: state.widgets,
+        theme: state.theme,
+      });
     },
     updateWidgetData: (state, action) => {
       const { widgetId, data } = action.payload;
