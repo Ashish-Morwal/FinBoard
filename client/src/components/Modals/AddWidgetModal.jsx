@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   closeAddWidgetModal,
@@ -286,7 +286,6 @@ export default function AddWidgetModal() {
                       { id: "card", icon: "fa-id-card", label: "Card" },
                       { id: "table", icon: "fa-table", label: "Table" },
                       { id: "chart", icon: "fa-chart-line", label: "Chart" },
-                      { id: "watchlist", icon: "fa-star", label: "Watchlist" },
                     ].map((mode) => (
                       <button
                         key={mode.id}
@@ -344,7 +343,6 @@ export default function AddWidgetModal() {
                     Available Fields
                   </label>
                   <div className="bg-secondary/30 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
-                    {console.log("Filtered fields in UI:", filteredFields)}
                     {filteredFields.length > 0 ? (
                       filteredFields.map((field, index) => (
                         <div
@@ -419,7 +417,7 @@ export default function AddWidgetModal() {
           </form>
         </div>
 
-        {/* Modal Actions - Fixed at bottom */}
+        {/* Modal Actions */}
         <div className="flex justify-end space-x-3 p-6 border-t border-border flex-shrink-0">
           <button
             type="button"

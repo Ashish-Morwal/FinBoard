@@ -7,7 +7,6 @@ import AddWidgetPlaceholder from "./AddWidgetPlaceholder";
 import BitcoinWidget from "../Widgets/BitcoinWidget";
 import TableWidget from "../Widgets/TableWidget";
 import ChartWidget from "../Widgets/ChartWidget";
-import WatchlistWidget from "../Widgets/WatchlistWidget";
 
 const WidgetRenderer = ({ widget }) => {
   switch (widget.type) {
@@ -17,8 +16,6 @@ const WidgetRenderer = ({ widget }) => {
       return <TableWidget widget={widget} />;
     case "chart":
       return <ChartWidget widget={widget} />;
-    case "watchlist":
-      return <WatchlistWidget widget={widget} />;
     default:
       return <WidgetCard widget={widget} />;
   }
