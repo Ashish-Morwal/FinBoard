@@ -56,12 +56,9 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Load host and port from environment
-  const port = parseInt(process.env.PORT || "5000", 10);
-  const host = process.env.HOST || "localhost";
+ const port = parseInt(process.env.PORT || "5000", 10);
+const host = process.env.HOST || "0.0.0.0"; 
 
-  // Start server
-  server.listen(port, host, () => {
-    log(`serving on http://${host}:${port}`);
-  });
-})();
+server.listen(port, host, () => {
+  log(`serving on http://${host}:${port}`);
+});
