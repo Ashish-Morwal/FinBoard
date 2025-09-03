@@ -1,23 +1,25 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import WidgetCard from "../Dashboard/WidgetCard";
-
 import { refreshWidgetData } from "../../store/dashboardSlice";
 
 export default function BitcoinWidget({ widget }) {
+  console.log("[BitcoinWidget] widget.data:", widget.data);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(refreshWidgetData(widget.id));
     }, widget.refreshInterval * 1000);
+
     dispatch(refreshWidgetData(widget.id));
     return () => clearInterval(interval);
   }, [dispatch, widget.id, widget.refreshInterval]);
 
   const formatNumber = (n) =>
     Number.isFinite(n)
-      ? n.toLocaleString(undefined, { maximumFractionDigits: 8 })
+      ? n.toLocaleString(undefined, { maximumFractionDigits: 2 })
       : "N/A";
 
   const dataArr = Array.isArray(widget.data) ? widget.data : [];
@@ -61,29 +63,38 @@ export default function BitcoinWidget({ widget }) {
   return (
     <WidgetCard widget={widget}>
       <div className="space-y-3">
-        {fields.map((field, i) => {
-          const raw = getValueForPath(field.path);
-          const val =
-            typeof raw === "number"
-              ? raw
-              : typeof raw === "string" && !isNaN(+raw)
-              ? +raw
-              : findByName(field.path);
-          return (
-            <div key={i} className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">
-                {field.label}
-              </span>
-              <span
-                className="font-mono text-card-foreground"
-                data-testid={`field-value-${field.path}`}
+        {/* Table Header */}
+        <div className="flex justify-between font-semibold border-b pb-1 text-sm">
+          <span>Company</span>
+          <span>Stocks</span>
+        </div>
+
+        {/* Table Rows */}
+        {fields.length > 0 ? (
+          fields.map((field, i) => {
+            const raw = getValueForPath(field.path);
+            const val =
+              typeof raw === "number"
+                ? raw
+                : typeof raw === "string" && !isNaN(+raw)
+                ? +raw
+                : findByName(field.path);
+            return (
+              <div
+                key={i}
+                className="flex justify-between items-center text-sm py-1"
               >
-                {formatNumber(val)}
-              </span>
-            </div>
-          );
-        })}
-        {fields.length === 0 && (
+                <span className="font-medium">{field.label}</span>
+                <span
+                  className="font-mono text-card-foreground"
+                  data-testid={`field-value-${field.path}`}
+                >
+                  {formatNumber(val)}
+                </span>
+              </div>
+            );
+          })
+        ) : (
           <div className="text-center py-4">
             <p className="text-sm text-muted-foreground">No data available</p>
           </div>

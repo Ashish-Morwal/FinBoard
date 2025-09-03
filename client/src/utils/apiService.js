@@ -1,9 +1,4 @@
-import {
-  normalizeForWidgets,
-  normalizeForTable,
-  normalizeForChart,
-} from "./normalizers.js";
-
+//apiService.js test
 export const testApiConnection = async (url, apiKeys = {}) => {
   try {
     const urlObj = new URL(url);
@@ -30,6 +25,7 @@ export const testApiConnection = async (url, apiKeys = {}) => {
   }
 };
 
+// apiService.js
 export const fetchWidgetData = async (url, apiKeys = {}) => {
   try {
     const urlObj = new URL(url);
@@ -50,8 +46,7 @@ export const fetchWidgetData = async (url, apiKeys = {}) => {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
-    const json = await response.json();
-    return normalizeForWidgets(json);
+    return await response.json();
   } catch (error) {
     console.error("Error fetching widget data:", error);
     throw error;

@@ -5,7 +5,11 @@ import {
   loadDashboardConfig as loadConfig,
 } from "../utils/storage";
 import { fetchWidgetData } from "../utils/apiService";
-import { normalizeForWidgets, normalizeForTable } from "../utils/normalizers";
+import {
+  normalizeForWidgets,
+  normalizeForTable,
+  normalizeAlphaVantage,
+} from "../utils/normalizers";
 
 export const loadDashboardConfig = createAsyncThunk(
   "dashboard/loadConfig",
@@ -27,18 +31,21 @@ export const refreshWidgetData = createAsyncThunk(
   async (widgetId, { getState }) => {
     const state = getState();
     const widget = state.dashboard.widgets.find((w) => w.id === widgetId);
+
     if (!widget) {
-      console.warn("⚠️ Widget not found:", widgetId);
       return { widgetId, data: [], type: null };
     }
+
     const apiKeys = state.dashboard.apiKeys || {};
-    console.log("🌍 Fetching for widget:", widget.title, "URL:", widget.apiUrl);
     try {
       const raw = await fetchWidgetData(widget.apiUrl, apiKeys);
-      console.log("🐛 RAW API response for widget", widgetId, raw);
+
+      // ✅ Debug log
+      console.log("[Slice] raw payload:", raw);
+
       return { widgetId, data: raw, type: widget.type };
     } catch (err) {
-      console.error("❌ Error in refreshWidgetData:", err);
+      console.error("[Slice] fetch error:", err);
       return { widgetId, data: [], type: widget.type };
     }
   }
@@ -47,6 +54,10 @@ export const refreshWidgetData = createAsyncThunk(
 const initialState = {
   widgets: [],
   theme: "dark",
+  apiKeys: {
+    alphaVantage: import.meta.env.VITE_ALPHA_VANTAGE_KEY || "44JDMSZCVYVMU7PM",
+    finnhub: import.meta.env.VITE_FINNHUB_KEY || "",
+  },
   isLoading: false,
   error: null,
   modals: {
@@ -222,6 +233,8 @@ const dashboardSlice = createSlice({
           if (widget) {
             if (type === "table") {
               widget.data = normalizeForTable(data);
+            } else if (data && data["Global Quote"]) {
+              widget.data = normalizeAlphaVantage(data);
             } else {
               widget.data = normalizeForWidgets(data);
             }

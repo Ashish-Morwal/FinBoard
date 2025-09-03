@@ -1,3 +1,4 @@
+
 import { Provider } from 'react-redux';
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -22,6 +23,7 @@ function Router() {
 }
 
 function App() {
+
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
