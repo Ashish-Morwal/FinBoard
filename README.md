@@ -40,10 +40,8 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
     cd backend
     ```
 2.  Create a `.env` file in the `backend` root directory (same level as `package.json`) and add your JWT secret and database connection string:
-    ```env
-    JWT_SECRET_KEY="your_jwt_secret_key"
-    DATABASE_URL="postgresql://user:password@host:dummy/mydb"
-    ```
+  BASE_URL="postgresql://user:password@host:dummy/mydb"
+    
     > ⚡ **Important:** Make sure you have PostgreSQL installed and running. You must replace `user`, `password`, `host`, and `mydb` with your actual database credentials.
 
 3.  Install dependencies:
@@ -94,4 +92,5 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
 -   Make sure to configure your API keys properly in `.env.local` for the frontend to work.
 -   The default refresh interval is 30 seconds, which can be customized per widget.
 -   This project works best with Node.js v18+.
+
 
