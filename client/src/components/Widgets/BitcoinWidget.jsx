@@ -1,8 +1,75 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import WidgetCard from '../Dashboard/WidgetCard';
-import { refreshWidgetData } from '../../store/dashboardSlice';
-import { formatCurrency } from '../../utils/formatters';
+// import { useEffect } from "react";
+// import { useDispatch } from "react-redux";
+// import WidgetCard from "../Dashboard/WidgetCard";
+// import { refreshWidgetData } from "../../store/dashboardSlice";
+// import { formatCurrency } from "../../utils/formatters";
+
+// export default function BitcoinWidget({ widget }) {
+//   const dispatch = useDispatch();
+
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       dispatch(refreshWidgetData(widget.id));
+//     }, widget.refreshInterval * 1000);
+
+//     // Initial load
+//     dispatch(refreshWidgetData(widget.id));
+
+//     return () => clearInterval(interval);
+//   }, [dispatch, widget.id, widget.refreshInterval]);
+
+//   const renderFieldValue = (field) => {
+//     if (!widget.data) return "Loading...";
+
+//     const value = getNestedValue(widget.data, field.path);
+
+//     if (value === undefined || value === null) return "N/A";
+
+//     // Format based on field type
+//     if (
+//       field.path.toLowerCase().includes("price") ||
+//       field.path.toLowerCase().includes("rate")
+//     ) {
+//       return formatCurrency(value);
+//     }
+
+//     return String(value);
+//   };
+
+//   const getNestedValue = (obj, path) => {
+//     return path.split(".").reduce((current, key) => current?.[key], obj);
+//   };
+
+//   return (
+//     <WidgetCard widget={widget}>
+//       <div className="space-y-3">
+//         {widget.selectedFields.map((field, index) => (
+//           <div key={index} className="flex justify-between items-center">
+//             <span className="text-sm text-muted-foreground">{field.label}</span>
+//             <span
+//               className="font-mono text-card-foreground"
+//               data-testid={`field-value-${field.path}`}
+//             >
+//               {renderFieldValue(field)}
+//             </span>
+//           </div>
+//         ))}
+
+//         {widget.selectedFields.length === 0 && (
+//           <div className="text-center py-4">
+//             <p className="text-sm text-muted-foreground">No fields selected</p>
+//           </div>
+//         )}
+//       </div>
+//     </WidgetCard>
+//   );
+// }
+
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import WidgetCard from "../Dashboard/WidgetCard";
+
+import { refreshWidgetData } from "../../store/dashboardSlice";
 
 export default function BitcoinWidget({ widget }) {
   const dispatch = useDispatch();
@@ -11,47 +78,81 @@ export default function BitcoinWidget({ widget }) {
     const interval = setInterval(() => {
       dispatch(refreshWidgetData(widget.id));
     }, widget.refreshInterval * 1000);
-
-    // Initial load
     dispatch(refreshWidgetData(widget.id));
-
     return () => clearInterval(interval);
   }, [dispatch, widget.id, widget.refreshInterval]);
 
-  const renderFieldValue = (field) => {
-    if (!widget.data) return 'Loading...';
-    
-    const value = getNestedValue(widget.data, field.path);
-    
-    if (value === undefined || value === null) return 'N/A';
-    
-    // Format based on field type
-    if (field.path.toLowerCase().includes('price') || field.path.toLowerCase().includes('rate')) {
-      return formatCurrency(value);
-    }
-    
-    return String(value);
+  const formatNumber = (n) =>
+    Number.isFinite(n)
+      ? n.toLocaleString(undefined, { maximumFractionDigits: 8 })
+      : "N/A";
+
+  const dataArr = Array.isArray(widget.data) ? widget.data : [];
+
+  const findByName = (key) => {
+    if (!key) return undefined;
+    const upper = String(key).toUpperCase();
+    const match = dataArr.find((d) => String(d.name).toUpperCase() === upper);
+    return match?.value;
   };
 
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  const getValueForPath = (path) => {
+    const direct = dataArr.find((d) => d.name === path)?.value;
+    if (Number.isFinite(direct)) return direct;
+    const fromKey = findByName(path);
+    if (Number.isFinite(fromKey)) return fromKey;
+    return undefined;
   };
+
+  const autoFields = () =>
+    dataArr.slice(0, 5).map((item) => ({
+      label: item.name,
+      path: item.name,
+    }));
+
+  const fieldsFromState =
+    widget?.selectedFields && widget.selectedFields.length > 0
+      ? widget.selectedFields
+      : autoFields();
+
+  const fields = fieldsFromState.some((f) => {
+    const v = getValueForPath(f.path);
+    return Number.isFinite(typeof v === "string" ? +v : v);
+  })
+    ? fieldsFromState
+    : autoFields();
+
+  console.log("[BitcoinWidget] items:", dataArr.length, dataArr.slice(0, 5));
+  console.log("[BitcoinWidget] fields:", fields);
 
   return (
     <WidgetCard widget={widget}>
       <div className="space-y-3">
-        {widget.selectedFields.map((field, index) => (
-          <div key={index} className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">{field.label}</span>
-            <span className="font-mono text-card-foreground" data-testid={`field-value-${field.path}`}>
-              {renderFieldValue(field)}
-            </span>
-          </div>
-        ))}
-        
-        {widget.selectedFields.length === 0 && (
+        {fields.map((field, i) => {
+          const raw = getValueForPath(field.path);
+          const val =
+            typeof raw === "number"
+              ? raw
+              : typeof raw === "string" && !isNaN(+raw)
+              ? +raw
+              : findByName(field.path);
+          return (
+            <div key={i} className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">
+                {field.label}
+              </span>
+              <span
+                className="font-mono text-card-foreground"
+                data-testid={`field-value-${field.path}`}
+              >
+                {formatNumber(val)}
+              </span>
+            </div>
+          );
+        })}
+        {fields.length === 0 && (
           <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground">No fields selected</p>
+            <p className="text-sm text-muted-foreground">No data available</p>
           </div>
         )}
       </div>

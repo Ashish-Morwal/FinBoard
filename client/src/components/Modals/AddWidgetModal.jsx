@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   closeAddWidgetModal,
   updateNewWidget,
@@ -9,24 +9,30 @@ import {
   addSelectedField,
   removeSelectedField,
   addWidget,
-} from '../../store/dashboardSlice';
-import { testApiConnection, extractFieldsFromResponse } from '../../utils/apiService';
-import { useToast } from '../../hooks/use-toast';
+} from "../../store/dashboardSlice";
+import {
+  testApiConnection,
+  extractFieldsFromResponse,
+} from "../../utils/apiService";
+import { useToast } from "../../hooks/use-toast";
 
 export default function AddWidgetModal() {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { modals } = useSelector((state) => state.dashboard);
   const settings = useSelector((state) => state.settings);
-  
-  const { isOpen, newWidget, apiFields, isTestingApi, apiTestResult } = modals.addWidget;
-  
-  const [fieldSearch, setFieldSearch] = useState('');
-  const [showArraysOnly, setShowArraysOnly] = useState(false);
-  const [displayMode, setDisplayMode] = useState('card');
 
-  const filteredFields = apiFields.filter(field => {
-    const matchesSearch = field.path.toLowerCase().includes(fieldSearch.toLowerCase());
+  const { isOpen, newWidget, apiFields, isTestingApi, apiTestResult } =
+    modals.addWidget;
+
+  const [fieldSearch, setFieldSearch] = useState("");
+  const [showArraysOnly, setShowArraysOnly] = useState(false);
+  const [displayMode, setDisplayMode] = useState("card");
+
+  const filteredFields = apiFields.filter((field) => {
+    const matchesSearch = field.path
+      .toLowerCase()
+      .includes(fieldSearch.toLowerCase());
     const matchesArrayFilter = !showArraysOnly || field.isArray;
     return matchesSearch && matchesArrayFilter;
   });
@@ -53,27 +59,34 @@ export default function AddWidgetModal() {
     dispatch(setApiTestResult(null));
 
     try {
-      const response = await testApiConnection(newWidget.apiUrl, settings.apiKeys);
-      console.log('API Response:', response);
+      const response = await testApiConnection(
+        newWidget.apiUrl,
+        settings.apiKeys
+      );
+      console.log("API Response:", response);
       const fields = extractFieldsFromResponse(response);
-      console.log('Extracted fields:', fields);
-      
+      console.log("Extracted fields:", fields);
+
       dispatch(setApiFields(fields));
-      dispatch(setApiTestResult({
-        success: true,
-        message: `API connection successful! ${fields.length} fields found.`,
-      }));
-      
+      dispatch(
+        setApiTestResult({
+          success: true,
+          message: `API connection successful! ${fields.length} fields found.`,
+        })
+      );
+
       toast({
         title: "Success",
         description: "API connection successful!",
       });
     } catch (error) {
-      dispatch(setApiTestResult({
-        success: false,
-        message: `Failed to connect: ${error.message}`,
-      }));
-      
+      dispatch(
+        setApiTestResult({
+          success: false,
+          message: `Failed to connect: ${error.message}`,
+        })
+      );
+
       toast({
         title: "Error",
         description: `Failed to connect to API: ${error.message}`,
@@ -85,11 +98,13 @@ export default function AddWidgetModal() {
   };
 
   const handleAddField = (field) => {
-    dispatch(addSelectedField({
-      path: field.path,
-      label: field.path.split('.').pop(),
-      type: field.type,
-    }));
+    dispatch(
+      addSelectedField({
+        path: field.path,
+        label: field.path.split(".").pop(),
+        type: field.type,
+      })
+    );
   };
 
   const handleRemoveField = (fieldPath) => {
@@ -98,7 +113,7 @@ export default function AddWidgetModal() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!newWidget.name.trim()) {
       toast({
         title: "Error",
@@ -126,10 +141,12 @@ export default function AddWidgetModal() {
       return;
     }
 
-    dispatch(addWidget({
-      ...newWidget,
-      type: displayMode,
-    }));
+    dispatch(
+      addWidget({
+        ...newWidget,
+        type: displayMode,
+      })
+    );
 
     toast({
       title: "Success",
@@ -142,11 +159,16 @@ export default function AddWidgetModal() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50" data-testid="add-widget-modal">
+    <div
+      className="fixed inset-0 bg-black/50 modal-backdrop flex items-center justify-center z-50"
+      data-testid="add-widget-modal"
+    >
       <div className="bg-popover border border-border rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
-          <h2 className="text-lg font-semibold text-popover-foreground">Add New Widget</h2>
-          <button 
+          <h2 className="text-lg font-semibold text-popover-foreground">
+            Add New Widget
+          </h2>
+          <button
             className="text-muted-foreground hover:text-foreground p-1"
             onClick={handleCloseModal}
             data-testid="button-close-modal"
@@ -154,35 +176,39 @@ export default function AddWidgetModal() {
             <i className="fas fa-times"></i>
           </button>
         </div>
-        
+
         <div className="p-6 overflow-y-auto flex-grow">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Widget Name */}
             <div>
-              <label className="text-sm font-medium text-popover-foreground mb-2 block">Widget Name</label>
-              <input 
-                type="text" 
+              <label className="text-sm font-medium text-popover-foreground mb-2 block">
+                Widget Name
+              </label>
+              <input
+                type="text"
                 placeholder="e.g., Bitcoin Price Tracker"
                 className="w-full bg-input border border-border rounded-lg px-3 py-2 text-popover-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 value={newWidget.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
                 data-testid="input-widget-name"
               />
             </div>
-            
+
             {/* API URL */}
             <div>
-              <label className="text-sm font-medium text-popover-foreground mb-2 block">API URL</label>
+              <label className="text-sm font-medium text-popover-foreground mb-2 block">
+                API URL
+              </label>
               <div className="flex space-x-2">
-                <input 
-                  type="url" 
+                <input
+                  type="url"
                   placeholder="e.g., https://api.coinbase.com/v2/exchange-rates?currency=BTC"
                   className="flex-1 bg-input border border-border rounded-lg px-3 py-2 text-popover-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   value={newWidget.apiUrl}
-                  onChange={(e) => handleInputChange('apiUrl', e.target.value)}
+                  onChange={(e) => handleInputChange("apiUrl", e.target.value)}
                   data-testid="input-api-url"
                 />
-                <button 
+                <button
                   type="button"
                   className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors flex items-center space-x-2"
                   onClick={handleTestApi}
@@ -202,54 +228,73 @@ export default function AddWidgetModal() {
                   )}
                 </button>
               </div>
-              
+
               {/* API Test Result */}
               {apiTestResult && (
-                <div className={`mt-2 flex items-center space-x-2 text-xs border rounded-lg px-3 py-2 ${
-                  apiTestResult.success 
-                    ? 'text-chart-1 bg-chart-1/10 border-chart-1/20' 
-                    : 'text-destructive bg-destructive/10 border-destructive/20'
-                }`}>
-                  <i className={`fas ${apiTestResult.success ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
+                <div
+                  className={`mt-2 flex items-center space-x-2 text-xs border rounded-lg px-3 py-2 ${
+                    apiTestResult.success
+                      ? "text-chart-1 bg-chart-1/10 border-chart-1/20"
+                      : "text-destructive bg-destructive/10 border-destructive/20"
+                  }`}
+                >
+                  <i
+                    className={`fas ${
+                      apiTestResult.success
+                        ? "fa-check-circle"
+                        : "fa-exclamation-circle"
+                    }`}
+                  ></i>
                   <span>{apiTestResult.message}</span>
                 </div>
               )}
             </div>
-            
+
             {/* Refresh Interval */}
             <div>
-              <label className="text-sm font-medium text-popover-foreground mb-2 block">Refresh Interval (seconds)</label>
-              <input 
-                type="number" 
-                min="30" 
+              <label className="text-sm font-medium text-popover-foreground mb-2 block">
+                Refresh Interval (seconds)
+              </label>
+              <input
+                type="number"
+                min="30"
                 placeholder="30"
                 className="w-full bg-input border border-border rounded-lg px-3 py-2 text-popover-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 value={newWidget.refreshInterval}
-                onChange={(e) => handleInputChange('refreshInterval', parseInt(e.target.value) || 30)}
+                onChange={(e) =>
+                  handleInputChange(
+                    "refreshInterval",
+                    parseInt(e.target.value) || 30
+                  )
+                }
                 data-testid="input-refresh-interval"
               />
             </div>
-            
+
             {/* Display Mode Selection */}
             {apiFields.length > 0 && (
               <div>
-                <label className="text-sm font-medium text-popover-foreground mb-3 block">Select Fields to Display</label>
+                <label className="text-sm font-medium text-popover-foreground mb-3 block">
+                  Select Fields to Display
+                </label>
                 <div className="mb-4">
-                  <label className="text-xs text-muted-foreground mb-2 block">Display Mode</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    Display Mode
+                  </label>
                   <div className="flex space-x-2">
                     {[
-                      { id: 'card', icon: 'fa-id-card', label: 'Card' },
-                      { id: 'table', icon: 'fa-table', label: 'Table' },
-                      { id: 'chart', icon: 'fa-chart-line', label: 'Chart' },
-                      { id: 'watchlist', icon: 'fa-star', label: 'Watchlist' },
+                      { id: "card", icon: "fa-id-card", label: "Card" },
+                      { id: "table", icon: "fa-table", label: "Table" },
+                      { id: "chart", icon: "fa-chart-line", label: "Chart" },
+                      { id: "watchlist", icon: "fa-star", label: "Watchlist" },
                     ].map((mode) => (
-                      <button 
+                      <button
                         key={mode.id}
                         type="button"
                         className={`px-3 py-1 rounded text-xs transition-colors ${
-                          displayMode === mode.id 
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'bg-secondary text-secondary-foreground hover:bg-accent'
+                          displayMode === mode.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-secondary-foreground hover:bg-accent"
                         }`}
                         onClick={() => setDisplayMode(mode.id)}
                         data-testid={`button-display-mode-${mode.id}`}
@@ -260,13 +305,15 @@ export default function AddWidgetModal() {
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Field Search */}
                 <div className="mb-3">
-                  <label className="text-xs text-muted-foreground mb-2 block">Search Fields</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    Search Fields
+                  </label>
                   <div className="relative">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Search for fields..."
                       className="w-full bg-input border border-border rounded-lg px-3 py-2 pl-8 text-popover-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring text-sm"
                       value={fieldSearch}
@@ -276,13 +323,13 @@ export default function AddWidgetModal() {
                     <i className="fas fa-search absolute left-2.5 top-2.5 text-muted-foreground text-xs"></i>
                   </div>
                 </div>
-                
+
                 {/* Field Options */}
                 <div className="mb-3">
                   <label className="flex items-center space-x-2 text-xs text-muted-foreground">
-                    <input 
-                      type="checkbox" 
-                      className="rounded text-primary focus:ring-ring" 
+                    <input
+                      type="checkbox"
+                      className="rounded text-primary focus:ring-ring"
                       checked={showArraysOnly}
                       onChange={(e) => setShowArraysOnly(e.target.checked)}
                       data-testid="checkbox-arrays-only"
@@ -290,20 +337,30 @@ export default function AddWidgetModal() {
                     <span>Show arrays only (for table view)</span>
                   </label>
                 </div>
-                
+
                 {/* Available Fields */}
                 <div className="mb-4">
-                  <label className="text-xs text-muted-foreground mb-2 block">Available Fields</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    Available Fields
+                  </label>
                   <div className="bg-secondary/30 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
-                    {console.log('Filtered fields in UI:', filteredFields)}
+                    {console.log("Filtered fields in UI:", filteredFields)}
                     {filteredFields.length > 0 ? (
                       filteredFields.map((field, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-input rounded border border-border hover:bg-accent/50 transition-colors">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-input rounded border border-border hover:bg-accent/50 transition-colors"
+                        >
                           <div className="flex-1">
-                            <div className="text-sm text-popover-foreground font-mono">{field.path}</div>
-                            <div className="text-xs text-muted-foreground">{field.type} | {String(field.value).substring(0, 50)}</div>
+                            <div className="text-sm text-popover-foreground font-mono">
+                              {field.path}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {field.type} |{" "}
+                              {String(field.value).substring(0, 50)}
+                            </div>
                           </div>
-                          <button 
+                          <button
                             type="button"
                             className="text-primary hover:text-primary/80 p-1"
                             onClick={() => handleAddField(field)}
@@ -316,21 +373,30 @@ export default function AddWidgetModal() {
                       ))
                     ) : (
                       <p className="text-sm text-muted-foreground text-center py-4">
-                        {apiFields.length === 0 ? 'Test API connection to see available fields' : 'No fields match your search'}
+                        {apiFields.length === 0
+                          ? "Test API connection to see available fields"
+                          : "No fields match your search"}
                       </p>
                     )}
                   </div>
                 </div>
-                
+
                 {/* Selected Fields */}
                 <div>
-                  <label className="text-xs text-muted-foreground mb-2 block">Selected Fields</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">
+                    Selected Fields
+                  </label>
                   <div className="space-y-2">
                     {newWidget.selectedFields.length > 0 ? (
                       newWidget.selectedFields.map((field, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-primary/10 border border-primary/20 rounded-lg">
-                          <span className="text-sm font-mono text-popover-foreground">{field.label}</span>
-                          <button 
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-primary/10 border border-primary/20 rounded-lg"
+                        >
+                          <span className="text-sm font-mono text-popover-foreground">
+                            {field.label}
+                          </span>
+                          <button
                             type="button"
                             className="text-destructive hover:text-destructive/80 p-1"
                             onClick={() => handleRemoveField(field.path)}
@@ -342,7 +408,9 @@ export default function AddWidgetModal() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-muted-foreground text-center py-4">No fields selected</p>
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No fields selected
+                      </p>
                     )}
                   </div>
                 </div>
@@ -350,10 +418,10 @@ export default function AddWidgetModal() {
             )}
           </form>
         </div>
-        
+
         {/* Modal Actions - Fixed at bottom */}
         <div className="flex justify-end space-x-3 p-6 border-t border-border flex-shrink-0">
-          <button 
+          <button
             type="button"
             className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-accent transition-colors"
             onClick={handleCloseModal}
@@ -361,7 +429,7 @@ export default function AddWidgetModal() {
           >
             Cancel
           </button>
-          <button 
+          <button
             type="button"
             onClick={handleSubmit}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"

@@ -1,108 +1,149 @@
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import WidgetCard from '../Dashboard/WidgetCard';
-import { refreshWidgetData } from '../../store/dashboardSlice';
-import { formatCurrency } from '../../utils/formatters';
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import WidgetCard from "../Dashboard/WidgetCard";
+import { refreshWidgetData } from "../../store/dashboardSlice";
+import { formatCurrency } from "../../utils/formatters";
+
+function normalizeForTable(data) {
+  if (!data) return [];
+
+  // Coinbase API format
+  if (data?.rates && typeof data.rates === "object") {
+    return Object.entries(data.rates).map(([symbol, rate]) => ({
+      symbol,
+      rate: parseFloat(rate),
+    }));
+  }
+
+  // Wrapped array: { data: [...] }
+  if (Array.isArray(data?.data)) {
+    return data.data.map((item) => ({
+      symbol: item.symbol ?? item.name,
+      rate: item.rate ?? item.value,
+    }));
+  }
+
+  // Direct array
+  if (Array.isArray(data)) {
+    return data.map((item) => ({
+      symbol: item.symbol ?? item.name,
+      rate: item.rate ?? item.value,
+    }));
+  }
+
+  return [];
+}
 
 export default function TableWidget({ widget }) {
   const dispatch = useDispatch();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 3;
 
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch(refreshWidgetData(widget.id));
     }, widget.refreshInterval * 1000);
 
-    // Initial load
     dispatch(refreshWidgetData(widget.id));
-
     return () => clearInterval(interval);
   }, [dispatch, widget.id, widget.refreshInterval]);
 
   useEffect(() => {
-    if (widget.data && Array.isArray(widget.data)) {
-      const filtered = widget.data.filter(row =>
-        Object.values(row).some(value =>
-          String(value).toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
-      setFilteredData(filtered);
-    }
+    const normalized = normalizeForTable(widget.data);
+
+    const filtered = normalized.filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+
+    setFilteredData(filtered);
+    setPage(1);
   }, [widget.data, searchQuery]);
 
-  const getNestedValue = (obj, path) => {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
-  };
-
-  const renderCellValue = (value, fieldPath) => {
-    if (value === undefined || value === null) return 'N/A';
-    
-    if (fieldPath.toLowerCase().includes('price') || fieldPath.toLowerCase().includes('rate')) {
-      return formatCurrency(value);
-    }
-    
-    return String(value);
-  };
+  const pageData = filteredData.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(filteredData.length / pageSize);
 
   return (
     <WidgetCard widget={widget}>
       <div className="mb-4 flex items-center justify-between">
         <div className="relative">
-          <input 
-            type="text" 
-            placeholder="Search table..." 
+          <input
+            type="text"
+            placeholder="Search..."
             className="bg-input border border-border rounded-lg px-3 py-1 text-sm w-48 pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            data-testid={`search-input-${widget.id}`}
           />
           <i className="fas fa-search absolute left-2.5 top-2 text-muted-foreground text-xs"></i>
         </div>
-        <span className="text-xs text-muted-foreground" data-testid={`table-stats-${widget.id}`}>
-          {filteredData.length} of {widget.data?.length || 0} items
+        <span className="text-xs text-muted-foreground">
+          {filteredData.length} items
         </span>
       </div>
-      
+
       <div className="overflow-x-auto">
-        {widget.selectedFields.length > 0 ? (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border">
-                {widget.selectedFields.map((field, index) => (
-                  <th key={index} className="text-left text-xs font-medium text-muted-foreground py-3 px-2">
-                    {field.label}
-                    <i className="fas fa-sort ml-1"></i>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.length > 0 ? (
-                filteredData.map((row, rowIndex) => (
-                  <tr key={rowIndex} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                    {widget.selectedFields.map((field, fieldIndex) => (
-                      <td key={fieldIndex} className="py-3 px-2 text-sm text-card-foreground">
-                        {renderCellValue(getNestedValue(row, field.path), field.path)}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={widget.selectedFields.length} className="py-8 text-center text-muted-foreground">
-                    No data available
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left text-xs font-medium text-muted-foreground py-3 px-2">
+                Symbol
+              </th>
+              <th className="text-left text-xs font-medium text-muted-foreground py-3 px-2">
+                Rate
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageData.length > 0 ? (
+              pageData.map((row, idx) => (
+                <tr
+                  key={idx}
+                  className="border-b border-border/50 hover:bg-secondary/50 transition-colors"
+                >
+                  <td className="py-3 px-2 text-sm">{row.symbol}</td>
+                  <td className="py-3 px-2 text-sm">
+                    {row.rate !== undefined ? formatCurrency(row.rate) : "N/A"}
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">No fields selected for table display</p>
-          </div>
-        )}
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={2}
+                  className="py-8 text-center text-muted-foreground"
+                >
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-2 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+          <span className="text-sm">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="px-2 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </WidgetCard>
   );
 }
