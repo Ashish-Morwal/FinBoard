@@ -62,3 +62,4 @@ const host = process.env.HOST || "0.0.0.0";
 server.listen(port, host, () => {
   log(`serving on http://${host}:${port}`);
 });
+})();
