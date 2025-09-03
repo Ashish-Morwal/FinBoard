@@ -1,15 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { saveApiKeys, loadApiKeys } from '../utils/storage';
+import { createSlice } from "@reduxjs/toolkit";
+import { saveApiKeys, loadApiKeys } from "../utils/storage";
 
 const initialState = {
   apiKeys: {
-    alphaVantage: 'LWYGTIKY5PIVTGPU',
-    finnhub: '',
+    alphaVantage: import.meta.env.VITE_ALPHA_VANTAGE_KEY,
+    finnhub: import.meta.env.VITE_FINNHUB_KEY,
   },
 };
 
 const settingsSlice = createSlice({
-  name: 'settings',
+  name: "settings",
   initialState,
   reducers: {
     loadSettings: (state) => {
@@ -28,5 +28,6 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { loadSettings, updateApiKey, updateApiKeys } = settingsSlice.actions;
+export const { loadSettings, updateApiKey, updateApiKeys } =
+  settingsSlice.actions;
 export default settingsSlice.reducer;
