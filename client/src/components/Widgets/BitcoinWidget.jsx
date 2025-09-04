@@ -4,7 +4,7 @@ import WidgetCard from "../Dashboard/WidgetCard";
 import { refreshWidgetData } from "../../store/dashboardSlice";
 
 export default function BitcoinWidget({ widget }) {
-  console.log("[BitcoinWidget] widget.data:", widget.data);
+  // console.log("[BitcoinWidget] widget.data:", widget.data);
 
   const dispatch = useDispatch();
 
@@ -57,8 +57,8 @@ export default function BitcoinWidget({ widget }) {
     ? fieldsFromState
     : autoFields();
 
-  console.log("[BitcoinWidget] items:", dataArr.length, dataArr.slice(0, 5));
-  console.log("[BitcoinWidget] fields:", fields);
+  // console.log("[BitcoinWidget] items:", dataArr.length, dataArr.slice(0, 5));
+  // console.log("[BitcoinWidget] fields:", fields);
 
   return (
     <WidgetCard widget={widget}>
