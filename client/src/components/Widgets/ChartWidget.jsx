@@ -27,7 +27,7 @@ export default function ChartWidget({ widget }) {
   }, [dispatch, widget.id, widget.refreshInterval]);
 
   const prepareChartData = () => {
-    console.log("[DEBUG] Widget data:", widget.name, widget.data);
+    // console.log("[DEBUG] Widget data:", widget.name, widget.data);
 
     if (!widget.data || !Array.isArray(widget.data)) return [];
     return widget.data
