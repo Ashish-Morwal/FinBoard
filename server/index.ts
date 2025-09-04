@@ -49,7 +49,7 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // Setup Vite in development, static in production
+  
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
