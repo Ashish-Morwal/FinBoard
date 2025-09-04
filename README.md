@@ -33,26 +33,6 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
     npm run dev
     ```
 
-### 🔹 For Backend (Node + Express + PostgreSQL)
-
-1.  Navigate to the backend folder:
-    ```bash
-    cd backend
-    ```
-2.  Create a `.env` file in the `backend` root directory (same level as `package.json`) and add your JWT secret and database connection string:
-
-
-3.  Install dependencies:
-    ```bash
-    npm install
-    ```
-4.  Run the backend server:
-    ```bash
-    npm run start:dev
-    ```
-
----
-
 ## 📌 Features
 
 ✅ Add, edit, and remove widgets (chart, table, Bitcoin/Ethereum rates, etc.)  
@@ -90,6 +70,7 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
 -   Make sure to configure your API keys properly in `.env.local` for the frontend to work.
 -   The default refresh interval is 30 seconds, which can be customized per widget.
 -   This project works best with Node.js v18+.
+
 
 
 
