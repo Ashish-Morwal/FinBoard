@@ -40,8 +40,8 @@ export const refreshWidgetData = createAsyncThunk(
     try {
       const raw = await fetchWidgetData(widget.apiUrl, apiKeys);
 
-      // ✅ Debug log
-      console.log("[Slice] raw payload:", raw);
+      
+      // console.log("[Slice] raw payload:", raw);
 
       return { widgetId, data: raw, type: widget.type };
     } catch (err) {
