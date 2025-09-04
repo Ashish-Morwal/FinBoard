@@ -2,7 +2,7 @@
 
 ![finboard-cover](/client/docs/image2.png)
 
-FinBoard is a customizable financial dashboard built with a **Next js** stack. It supports **real-time widgets** (charts, tables, and stats) powered by APIs like **Coinbase, Finnhub, and Alpha Vantage**.
+FinBoard is a customizable financial dashboard built with a **React js** stack. It supports **real-time widgets** (charts, tables, and stats) powered by APIs like **Coinbase, Finnhub, and Alpha Vantage**.
 
 
 ---
@@ -47,11 +47,12 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
 
 ## 🛠 Tech Stack
 
--   **Frontend:** React (Vite), Redux Toolkit, TailwindCSS, Recharts
--   **Backend:** Node.js, Express.js, PostgreSQL
--   **APIs Integrated:** Coinbase, Finnhub, Alpha Vantage
+- **Frontend:** React (Vite), Redux Toolkit, TailwindCSS, Recharts, Shadcn/UI 
+- **Backend:** Node.js, Express.js, JWT Authentication (Mock / In-memory data, no database)  
+- **APIs Integrated:** Coinbase, Finnhub, Alpha Vantage  
 
 ---
+
 
 ## 📷 Screenshots
 
@@ -70,6 +71,7 @@ FinBoard is a customizable financial dashboard built with a **Next js** stack. I
 -   Make sure to configure your API keys properly in `.env.local` for the frontend to work.
 -   The default refresh interval is 30 seconds, which can be customized per widget.
 -   This project works best with Node.js v18+.
+
 
 
 
